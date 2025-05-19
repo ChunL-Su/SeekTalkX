@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>DeepSeek智能问答机</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chat-box {
+            height: 300px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        #question { width: 60%; padding: 8px; }
+        button { padding: 8px 15px; }
+        .user {
+            background-color: #95ec69; /* 微信用户消息的浅绿色 */
+            color: black;
+            border-radius: 8px 0 8px 8px; /* 右上角直角，其他圆角 */
+            padding: 8px 12px;
+            margin: 5px 0;
+            max-width: 65%;
+            word-wrap: break-word;
+            display: inline-block;
+            text-align: left;
+            float: right;
+            clear: both;
+        }
+        .bot {
+            background-color: #9c9b9b; /* 微信对方消息的灰色 */
+            color: black;
+            border-radius: 0 8px 8px 8px; /* 左上角直角，其他圆角 */
+            padding: 8px 12px;
+            margin: 5px 0;
+            max-width: 65%;
+            word-wrap: break-word;
+            display: inline-block;
+            text-align: left;
+            float: left;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <h1>智能问答机</h1>
+    <div id="chat-box"></div>
+    <input type="text" id="question" placeholder="输入你的问题...">
+    <button onclick="sendText()" title="发送问题给deepseek" id="send-btn">发送(Enter)</button>
+    <button onclick="startRecording()">语音提问</button>
+
+    <script>
+        const input_question = document.getElementById("question");
+        const send_btn = document.getElementById("send-btn");
+
+        input_question.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault(); // 阻止输入框换行
+                send_btn.click();   // 触发发送
+            }
+        });
+
+        function appendMessage(sender, message) {
+            const chatBox = document.getElementById('chat-box');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = sender;
+            msgDiv.innerHTML = message;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function sendText() {
+            const question = document.getElementById('question').value;
+            if (!question) return;
+
+            appendMessage('user', question);
+            document.getElementById('question').value = '';
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `text=${encodeURIComponent(question)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.text) {
+                    appendMessage('bot', data.text);
+                }
+            });
+        }
+
+        function startRecording() {
+            // 这里简化处理，实际应该使用Web Audio API录制音频
+            alert("开始录音...请说话（实际实现需要浏览器录音API）");
+
+            // 模拟录音过程
+            setTimeout(() => {
+                const audioBlob = new Blob(); // 实际应该是录制的音频
+                sendAudio(audioBlob);
+            }, 2000);
+        }
+
+        function sendAudio(audioBlob) {
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.wav');
+
+            fetch('/ask', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.question) {
+                    appendMessage('user', data.question);
+                }
+                if (data.text) {
+                    appendMessage('bot', data.text);
+                }
+            });
+        }
+
+        // 实际项目中应该实现真正的录音功能
+        // 可以使用navigator.mediaDevices.getUserMedia()
+    </script>
+</body>
+</html>
