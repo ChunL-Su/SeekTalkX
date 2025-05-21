@@ -26,7 +26,10 @@
 
         // 录音按钮部分处理逻辑
         let isRecording = false;
+        let mediaRecorder;
+        const audioChunks = [];
         const recordButton = document.getElementById("speak-btn")
+
         recordButton.addEventListener('click', async () => {
             if (!isRecording) {
                 isRecording = true;
@@ -34,13 +37,28 @@
                 recordButton.classList.add('recording');
                 // 开始调用麦克风，暂时想法是最大录音10s后自动关闭
                 try{
-                    appendMessage('bot', "try: ");
+                    appendMessage('bot', "Enter try");
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+                    // 绑定关闭函数
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        audioChunks.length = 0;
+                    }
+
+
+
                 }catch (error){
                     // console.error('发送录音失败:', error);
                     // transcriptDiv.textContent = "发送录音失败: " + error.message;
                     appendMessage('bot', "发送录音失败: " + error.message);
                 }finally {
                     appendMessage('bot', "finally: ");
+                    mediaRecorder.stop()
                 }
 
 
@@ -50,6 +68,9 @@
                 recordButton.classList.remove('recording');
                 alertBox.textContent = "正在转换";
                 alertBox.classList.add("show"); // 显示
+
+                mediaRecorder.stop()
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
 
                 setTimeout(() => {
                     alertBox.classList.remove("show"); // 隐藏
