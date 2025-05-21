@@ -15,6 +15,7 @@
     <script>
         const input_question = document.getElementById("question");
         const send_btn = document.getElementById("send-btn");
+        const alertBox = document.getElementById("customAlert");
 
         input_question.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
@@ -31,11 +32,22 @@
                 isRecording = true;
                 recordButton.textContent = "录音中...";
                 recordButton.classList.add('recording');
+                // 开始调用麦克风，暂时想法是最大录音10s后自动关闭
+                try{
+                    appendMessage('bot', "try: ");
+                }catch (error){
+                    // console.error('发送录音失败:', error);
+                    // transcriptDiv.textContent = "发送录音失败: " + error.message;
+                    appendMessage('bot', "发送录音失败: " + error.message);
+                }finally {
+                    appendMessage('bot', "finally: ");
+                }
+
+
             }else{
                 isRecording = false;
                 recordButton.textContent = "语音输入";
                 recordButton.classList.remove('recording');
-                const alertBox = document.getElementById("customAlert");
                 alertBox.textContent = "正在转换";
                 alertBox.classList.add("show"); // 显示
 
@@ -57,7 +69,14 @@
 
         function sendText() {
             const question = document.getElementById('question').value;
-            if (!question) return;
+            if (!question){
+                alertBox.textContent = "未输入文本";
+                alertBox.classList.add("show"); // 显示
+                setTimeout(() => {
+                    alertBox.classList.remove("show"); // 隐藏
+                }, 1000);
+                return;
+            }
 
             appendMessage('user', question);
             document.getElementById('question').value = '';
@@ -77,8 +96,6 @@
             });
         }
 
-        // 实际项目中应该实现真正的录音功能
-        // 可以使用navigator.mediaDevices.getUserMedia()
     </script>
 </body>
 </html>
