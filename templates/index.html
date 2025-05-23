@@ -35,9 +35,7 @@
                 isRecording = true;
                 recordButton.textContent = "录音中...";
                 recordButton.classList.add('recording');
-                // 开始调用麦克风，暂时想法是最大录音10s后自动关闭
                 try{
-                    appendMessage('bot', "Enter try");
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
 
@@ -48,20 +46,32 @@
                     mediaRecorder.onstop = async () => {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                         audioChunks.length = 0;
+                        try {
+                            const formData = new FormData();
+                            formData.append('audio', audioBlob, 'recording.wav');
+
+                            const response = await fetch('/transcribe', {
+                                method: 'POST',
+                                body: formData
+                            });
+                            const result = await response.json();
+                            if (result.text) {
+                                appendMessage('bot', "录音转换成功: " + result.text);
+                            } else {
+                                // appendMessage('bot', "转文字失败: " + (result.error || ''));
+                                appendMessage('bot', "转文字失败: " + (result.audio_path || ''));
+                            }
+                        }catch (e){
+                            appendMessage('bot', "录音失败: " + e.message);
+                        }
                     }
-
-
+                    mediaRecorder.start()
 
                 }catch (error){
-                    // console.error('发送录音失败:', error);
-                    // transcriptDiv.textContent = "发送录音失败: " + error.message;
                     appendMessage('bot', "发送录音失败: " + error.message);
-                }finally {
-                    appendMessage('bot', "finally: ");
                     mediaRecorder.stop()
                 }
-
-
+                
             }else{
                 isRecording = false;
                 recordButton.textContent = "语音输入";
