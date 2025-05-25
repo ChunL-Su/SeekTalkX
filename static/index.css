@@ -1,14 +1,37 @@
 body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+div::-webkit-scrollbar {
+  display: none; /* 适用于 Chrome, Safari, Opera */
+}
 #chat-box {
     height: 300px;
-    border: 1px solid #ddd;
+    border: 2px solid #e5e7eb;
+    border-radius: 18px 18px 0 0;
     padding: 10px;
     overflow-y: scroll;
     margin-bottom: 10px;
-    background-color: #f9f9f9;
+    background-color: white;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
 }
-#question { width: 60%; padding: 8px; }
-button { padding: 8px 15px; }
+#question {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  padding: 16px 60px 16px 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  min-height: 60px;
+  max-height: 200px;
+  border-radius: 16px;
+  background: transparent;
+}
+button {
+    background: white;
+    border: 2px solid #dfe1e6;
+    border-radius: 10px;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+    font-size: 17px;
+}
 button.recording {
     background-color: #f44336;
 }
@@ -55,4 +78,20 @@ button.recording {
 .custom-alert.show {
     opacity: 1;
     transition: opacity 0.2s ease-in;
+}
+
+#input-container {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+  background: white;
+  transition: all 0.3s ease;
+  border: 2px solid #e5e7eb;
+}
+#input-actions {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
 }
