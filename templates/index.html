@@ -8,9 +8,14 @@
     <h1>智能问答机</h1>
     <div id="chat-box"></div>
     <div id="customAlert" class="custom-alert"></div>
-    <input type="text" id="question" placeholder="输入你的问题...">
-    <button onclick="sendText()" title="发送问题给deepseek" id="send-btn">发送(Enter)</button>
-    <button id="speak-btn">语音输入</button>
+    <!--        <input type="text" id="question" placeholder="输入你的问题...">-->
+    <div id="input-container">
+        <textarea id="question" placeholder="输入您的问题..." rows="1"></textarea>
+        <div id="input-actions">
+            <button onclick="sendText()" title="发送问题给deepseek" id="send-btn">发送(Enter)</button>
+            <button id="speak-btn">语音输入</button>
+        </div>
+    </div>
 
     <script>
         const input_question = document.getElementById("question");
@@ -35,43 +40,42 @@
                 isRecording = true;
                 recordButton.textContent = "录音中...";
                 recordButton.classList.add('recording');
-                try{
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
 
-                    mediaRecorder.ondataavailable = (event) => {
-                        audioChunks.push(event.data);
-                    };
-                    // 绑定关闭函数
-                    mediaRecorder.onstop = async () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                        audioChunks.length = 0;
-                        try {
-                            const formData = new FormData();
-                            formData.append('audio', audioBlob, 'recording.wav');
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                // 绑定关闭函数
+                mediaRecorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    audioChunks.length = 0;
+                    try {
+                        const formData = new FormData();
+                        formData.append('audio', audioBlob, 'recording.wav');
 
-                            const response = await fetch('/transcribe', {
-                                method: 'POST',
-                                body: formData
-                            });
-                            const result = await response.json();
-                            if (result.text) {
-                                appendMessage('bot', "录音转换成功: " + result.text);
-                            } else {
-                                // appendMessage('bot', "转文字失败: " + (result.error || ''));
-                                appendMessage('bot', "转文字失败: " + (result.audio_path || ''));
-                            }
-                        }catch (e){
-                            appendMessage('bot', "录音失败: " + e.message);
+                        const response = await fetch('/transcribe', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        const result = await response.json();
+                        if (result.text) {
+                            appendMessage('bot', "录音转换成功: " + result.text);
+                        } else {
+                            // appendMessage('bot', "转文字失败: " + (result.error || ''));
+                            appendMessage('bot', "转文字失败: " + (result.audio_path || ''));
                         }
+                    }catch (e){
+                        appendMessage('bot', "录音失败: " + e.message);
                     }
+                }
+                try{
                     mediaRecorder.start()
-
                 }catch (error){
                     appendMessage('bot', "发送录音失败: " + error.message);
                     mediaRecorder.stop()
                 }
-                
+
             }else{
                 isRecording = false;
                 recordButton.textContent = "语音输入";
