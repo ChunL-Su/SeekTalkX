@@ -21,6 +21,17 @@
         const input_question = document.getElementById("question");
         const send_btn = document.getElementById("send-btn");
         const alertBox = document.getElementById("customAlert");
+        const inputContainer = document.getElementById("input-container");
+
+        input_question.addEventListener('input', function() {
+            this.style.height = '1px'; // 先重置高度
+            this.style.height = (this.scrollHeight) + 'px'; // 设置新高度
+
+            // 调整input-container高度
+            const newHeight = this.scrollHeight + 60; // 60是按钮和padding的大约高度
+            inputContainer.style.height = Math.min(newHeight, 260) + 'px'; // 260是最大高度(200+60)
+        });
+        input_question.dispatchEvent(new Event('input'));
 
         input_question.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
@@ -115,6 +126,8 @@
 
             appendMessage('user', question);
             document.getElementById('question').value = '';
+            input_question.style.height = '40px'; // 设置新高度
+            inputContainer.style.height = '100px';
 
             fetch('/ask', {
                 method: 'POST',
@@ -123,11 +136,20 @@
                 },
                 body: `text=${encodeURIComponent(question)}`
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.text) {
                     appendMessage('bot', data.text);
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                appendMessage('bot', '抱歉，服务暂时不可用，请稍后再试');
             });
         }
 
