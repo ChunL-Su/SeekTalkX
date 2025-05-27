@@ -78,38 +78,42 @@ button.recording {
 
 #question {
     border: none;
-    padding: 10px;
     max-width: 800px;
     min-height: 50px;
     max-height: 200px;
-    width: 100%;
+    width: 99%;
     outline: none;
     resize: none;
     font-size: 16px;
     line-height: 1.5;
-    rows: 5;
+    rows: 4;
     box-sizing: border-box;
-    margin-top: auto; /* 关键：让 textarea 向上推，而不是向下扩展 */
+    margin-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 #input-container {
     position: fixed;
     bottom: 130px;
-    left: 0;
-    right: 0;
-    max-width: 800px;
+    /*left: 0;
+    right: 0;*/
+    width: 800px;
     margin: 0 auto;
     border-radius: 0 0 18px 18px;
     box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
     background: white;
     border: 2px solid #e5e7eb;
-    min-height: 60px;
+    min-height: 40px;
     max-height: 260px;
     transition: height 0.2s;
 }
 #input-actions {
     display: flex;
     justify-content: flex-end; /* 让按钮靠右 */
-    padding: 8px; /* 增加内边距 */
+    padding-left: 4px; /* 增加内边距 */
+    padding-right: 4px; /* 增加内边距 */
+    padding-top: 2px; /* 增加内边距 */
+    padding-bottom: 2px; /* 增加内边距 */
     gap: 8px; /* 按钮间距 */
 }
