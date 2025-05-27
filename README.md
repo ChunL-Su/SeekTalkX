@@ -3,4 +3,5 @@
 - 注意：调用deepseek API需要先去官网获取API KEY并充值
 
 - 近期正在改前端页面交互部分
-![ui](images/example.png)
+- ![ui](images/example.png)
+- <img src="images/ui.png" alt="ui" width="200">
